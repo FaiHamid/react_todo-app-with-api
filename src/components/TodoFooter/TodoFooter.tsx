@@ -5,7 +5,7 @@ import { Filters, Todo } from '../../types';
 interface Props {
   todos: Todo[];
   selectedFilter: Filters;
-  onChangeFilter: (fil: Filters) => void;
+  onChangeFilter: (filter: Filters) => void;
   onDeleteCompleted: () => void;
 }
 

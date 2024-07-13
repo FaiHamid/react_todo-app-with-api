@@ -6,13 +6,18 @@ import { Todo } from '../../types/Todo';
 import { LoadingType } from '../../types';
 import { TodoEditForm } from '../TodoEditForm';
 
+enum EditKeyOfTodo {
+  Title = 'title',
+  Completed = 'completed',
+}
+
 interface Props {
   todo: Todo;
   loadingIds: LoadingType;
   onEdit: (
     todo: Todo,
     key: keyof Todo,
-    val: boolean | string,
+    value: boolean | string,
   ) => Promise<boolean>;
   onDelete: (todoID: number) => Promise<void>;
 }
@@ -43,7 +48,9 @@ export const TodoItem: React.FC<Props> = ({
   const handleEdit = () => {
     setLoading(true);
 
-    onEdit(todo, 'completed', !todo.completed).finally(() => setLoading(false));
+    onEdit(todo, EditKeyOfTodo.Completed, !todo.completed).finally(() =>
+      setLoading(false),
+    );
   };
 
   const handleSubmitForm = (value: string) => {
@@ -60,7 +67,7 @@ export const TodoItem: React.FC<Props> = ({
     }
 
     setLoading(true);
-    onEdit(todo, 'title', value.trim())
+    onEdit(todo, EditKeyOfTodo.Title, value.trim())
       .then(res => setIsEditing(res))
       .finally(() => setLoading(false));
   };

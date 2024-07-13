@@ -12,7 +12,7 @@ interface Props {
   onEdit: (
     todo: Todo,
     key: keyof Todo,
-    val: boolean | string,
+    value: boolean | string,
   ) => Promise<boolean>;
   onDelete: (todoID: number) => Promise<void>;
 }

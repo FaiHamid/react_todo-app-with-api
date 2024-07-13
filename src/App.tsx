@@ -1,12 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TodoList } from './components/TodoList';
-import { Todo } from './types/Todo';
 import { addTodo, deleteTodo, getTodos, updateTodo } from './api/todos';
-import { Filters, LoadingType } from './types';
+import { Filters, LoadingType, Todo } from './types';
 import { TodoHeader } from './components/TodoHeader';
 import { TodoFooter } from './components/TodoFooter';
 import { ErrorNotification } from './components/ErrorNotification';
-import { makeLoadingObject } from './utils/makeLoadingObject';
+import { handleFilteredTodos, makeLoadingObject } from './utils';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -21,7 +20,6 @@ export const App: React.FC = () => {
       .then(setTodos)
       .catch(() => {
         setErrorMessage('Unable to load todos');
-        // throw new Error('Unable to load todos');
       });
   }, []);
 
@@ -34,15 +32,15 @@ export const App: React.FC = () => {
   };
 
   const updateCompletedTodo = (
-    updTodo: Todo,
+    updatedTodo: Todo,
     key: keyof Todo,
     value: boolean | string,
   ) => {
-    return updateTodo({ ...updTodo, [key]: value })
-      .then((respTodo: Todo) => {
-        setTodos(currTodos => {
-          return currTodos.map(todo =>
-            todo.id === updTodo.id ? respTodo : todo,
+    return updateTodo({ ...updatedTodo, [key]: value })
+      .then((updatedTodoFromServer: Todo) => {
+        setTodos(prevTodos => {
+          return prevTodos.map(todo =>
+            todo.id === updatedTodo.id ? updatedTodoFromServer : todo,
           );
         });
 
@@ -59,7 +57,7 @@ export const App: React.FC = () => {
     const isActive = todos.filter(todo => !todo.completed);
     const isActiveIds = makeLoadingObject(isActive);
 
-    if (isActive.length > 1) {
+    if (isActive.length >= 1) {
       setLoadingIds(isActiveIds);
 
       Promise.all(
@@ -67,11 +65,11 @@ export const App: React.FC = () => {
       )
         .then(() =>
           setTodos(prevTodos => {
-            return prevTodos.map(todo2 => {
-              if (Object.hasOwn(isActiveIds, todo2.id)) {
-                return { ...todo2, completed: true };
+            return prevTodos.map(todo => {
+              if (Object.hasOwn(isActiveIds, todo.id)) {
+                return { ...todo, completed: true };
               } else {
-                return todo2;
+                return todo;
               }
             });
           }),
@@ -86,7 +84,7 @@ export const App: React.FC = () => {
     Promise.all(todos.map(todo => updateTodo({ ...todo, completed: false })))
       .then(() =>
         setTodos(prevTodos => {
-          return prevTodos.map(todo2 => ({ ...todo2, completed: false }));
+          return prevTodos.map(todo => ({ ...todo, completed: false }));
         }),
       )
       .catch(() => setErrorMessage('Unable to update a todo'))
@@ -102,14 +100,14 @@ export const App: React.FC = () => {
       completedTodos.map(todo => deleteTodo(todo.id).then(() => todo)),
     )
       .then(values => {
-        values.map(value1 => {
-          if (value1.status === 'rejected') {
+        values.map(value => {
+          if (value.status === 'rejected') {
             setErrorMessage('Unable to delete a todo');
           } else {
             setTodos(prevTodos => {
-              const todoID = value1.value as Todo;
+              const todoID = value.value as Todo;
 
-              return prevTodos.filter(todo1 => todo1.id !== todoID.id);
+              return prevTodos.filter(todo => todo.id !== todoID.id);
             });
           }
         });
@@ -127,22 +125,6 @@ export const App: React.FC = () => {
       });
   };
 
-  const filteredTodos = useMemo(() => {
-    const filtrTodos = [...todos];
-
-    switch (filter) {
-      case Filters.Active:
-        return filtrTodos.filter(todo => !todo.completed);
-
-      case Filters.Completed:
-        return filtrTodos.filter(todo => todo.completed);
-
-      case Filters.All:
-      default:
-        return filtrTodos;
-    }
-  }, [filter, todos]);
-
   return (
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
@@ -158,7 +140,7 @@ export const App: React.FC = () => {
         />
 
         <TodoList
-          todos={filteredTodos}
+          todos={handleFilteredTodos(todos, filter)}
           tempTodo={tempTodo}
           loadingIds={loadingIds}
           onEdit={updateCompletedTodo}

@@ -7,8 +7,8 @@ interface Props {
   tempTodo: Todo | null;
   todos: Todo[];
   onToggleTodos: () => void;
-  onChangeTempTodo: (val: Todo | null) => void;
-  onErrorMessage: (val: string) => void;
+  onChangeTempTodo: (tempodo: Todo | null) => void;
+  onErrorMessage: (message: string) => void;
   onSubmit: (todo: Todo) => Promise<Todo | void>;
 }
 
@@ -25,7 +25,7 @@ export const TodoHeader: React.FC<Props> = ({
   const titleField = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (titleField.current && tempTodo === null) {
+    if (titleField.current && !tempTodo) {
       titleField.current.focus();
     }
   }, [tempTodo, todos.length]);

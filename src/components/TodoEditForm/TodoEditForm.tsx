@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 interface Props {
   title: string;
   titleFieldForm: React.RefObject<HTMLInputElement>;
-  onSubmit: (val: string) => void;
+  onSubmit: (value: string) => void;
 }
 
 export const TodoEditForm: React.FC<Props> = ({
