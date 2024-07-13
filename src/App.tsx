@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { TodoList } from './components/TodoList';
 import { Todo } from './types/Todo';
 import { addTodo, deleteTodo, getTodos, updateTodo } from './api/todos';
@@ -24,14 +24,6 @@ export const App: React.FC = () => {
         // throw new Error('Unable to load todos');
       });
   }, []);
-
-  const titleField = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (titleField.current && tempTodo === null) {
-      titleField.current.focus();
-    }
-  }, [tempTodo, todos.length]);
 
   const handleAddTodo = (newTodo: Todo): Promise<Todo | void> => {
     setTempTodo(newTodo);
@@ -157,7 +149,6 @@ export const App: React.FC = () => {
 
       <div className="todoapp__content">
         <TodoHeader
-          titleField={titleField}
           tempTodo={tempTodo}
           todos={todos}
           onToggleTodos={handleToggleTodos}

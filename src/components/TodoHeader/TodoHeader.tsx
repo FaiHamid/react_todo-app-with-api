@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { Todo } from '../../types';
 import { USER_ID } from '../../api/todos';
 
 interface Props {
-  titleField: React.RefObject<HTMLInputElement>;
   tempTodo: Todo | null;
   todos: Todo[];
   onToggleTodos: () => void;
@@ -14,7 +13,6 @@ interface Props {
 }
 
 export const TodoHeader: React.FC<Props> = ({
-  titleField,
   tempTodo,
   todos,
   onToggleTodos,
@@ -24,6 +22,13 @@ export const TodoHeader: React.FC<Props> = ({
 }) => {
   const [value, setValue] = useState('');
   const isAllCompleted = todos.every(todo => todo.completed);
+  const titleField = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (titleField.current && tempTodo === null) {
+      titleField.current.focus();
+    }
+  }, [tempTodo, todos.length]);
 
   const addingTodo = (event: React.FormEvent<HTMLElement>) => {
     event.preventDefault();
