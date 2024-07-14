@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TodoList } from './components/TodoList';
 import { addTodo, deleteTodo, getTodos, updateTodo } from './api/todos';
-import { Filters, LoadingType, Todo } from './types';
+import { ErrorMessages, Filters, LoadingType, Todo } from './types';
 import { TodoHeader } from './components/TodoHeader';
 import { TodoFooter } from './components/TodoFooter';
 import { ErrorNotification } from './components/ErrorNotification';
@@ -19,7 +19,7 @@ export const App: React.FC = () => {
     getTodos()
       .then(setTodos)
       .catch(() => {
-        setErrorMessage('Unable to load todos');
+        setErrorMessage(ErrorMessages.LoadError);
       });
   }, []);
 
@@ -47,26 +47,26 @@ export const App: React.FC = () => {
         return false;
       })
       .catch(() => {
-        setErrorMessage('Unable to update a todo');
+        setErrorMessage(ErrorMessages.UpdateError);
 
         return true;
       });
   };
 
   const handleToggleTodos = () => {
-    const isActive = todos.filter(todo => !todo.completed);
-    const isActiveIds = makeLoadingObject(isActive);
+    const activeTodos = todos.filter(todo => !todo.completed);
+    const activeTodosIds = makeLoadingObject(activeTodos);
 
-    if (isActive.length >= 1) {
-      setLoadingIds(isActiveIds);
+    if (activeTodos.length) {
+      setLoadingIds(activeTodosIds);
 
       Promise.all(
-        isActive.map(todo => updateTodo({ ...todo, completed: true })),
+        activeTodos.map(todo => updateTodo({ ...todo, completed: true })),
       )
         .then(() =>
           setTodos(prevTodos => {
             return prevTodos.map(todo => {
-              if (Object.hasOwn(isActiveIds, todo.id)) {
+              if (Object.hasOwn(activeTodosIds, todo.id)) {
                 return { ...todo, completed: true };
               } else {
                 return todo;
@@ -74,7 +74,7 @@ export const App: React.FC = () => {
             });
           }),
         )
-        .catch(() => setErrorMessage('Unable to update a todo'))
+        .catch(() => setErrorMessage(ErrorMessages.UpdateError))
         .finally(() => setLoadingIds({}));
 
       return;
@@ -87,7 +87,7 @@ export const App: React.FC = () => {
           return prevTodos.map(todo => ({ ...todo, completed: false }));
         }),
       )
-      .catch(() => setErrorMessage('Unable to update a todo'))
+      .catch(() => setErrorMessage(ErrorMessages.UpdateError))
       .finally(() => setLoadingIds({}));
   };
 
@@ -102,7 +102,7 @@ export const App: React.FC = () => {
       .then(values => {
         values.map(value => {
           if (value.status === 'rejected') {
-            setErrorMessage('Unable to delete a todo');
+            setErrorMessage(ErrorMessages.DeleteError);
           } else {
             setTodos(prevTodos => {
               const todoID = value.value as Todo;
@@ -121,7 +121,7 @@ export const App: React.FC = () => {
         setTodos(prevTodos => prevTodos.filter(todo => todo.id !== todoID));
       })
       .catch(() => {
-        setErrorMessage('Unable to delete a todo');
+        setErrorMessage(ErrorMessages.DeleteError);
       });
   };
 

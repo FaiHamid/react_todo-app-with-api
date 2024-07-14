@@ -5,6 +5,8 @@ import { TodoItem } from '../TodoItem';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { LoadingType } from '../../types';
 
+const TRANSITION_TIME = 300;
+
 interface Props {
   todos: Todo[];
   tempTodo: Todo | null;
@@ -27,7 +29,11 @@ export const TodoList: React.FC<Props> = ({
   <section className="todoapp__main" data-cy="TodoList">
     <TransitionGroup>
       {todos.map(todo => (
-        <CSSTransition key={todo.id} timeout={300} classNames="item">
+        <CSSTransition
+          key={todo.id}
+          timeout={TRANSITION_TIME}
+          classNames="item"
+        >
           <TodoItem
             key={todo.id}
             todo={todo}
@@ -39,7 +45,7 @@ export const TodoList: React.FC<Props> = ({
       ))}
 
       {tempTodo !== null && (
-        <CSSTransition key={0} timeout={300} classNames="temp-item">
+        <CSSTransition key={0} timeout={TRANSITION_TIME} classNames="temp-item">
           <TodoItem
             todo={tempTodo}
             onDelete={onDelete}

@@ -15,24 +15,24 @@ export const TodoFooter: React.FC<Props> = ({
   onChangeFilter,
   onDeleteCompleted,
 }) => {
-  const allFilters = Object.values(Filters);
-  const activeTodos = todos.filter(todo => !todo.completed).length;
-  const isCompleted = todos.some(todo => todo.completed);
-  let isDelCompleted = false;
+  const filtersValue = Object.values(Filters);
+  const activeTodosCount = todos.filter(todo => !todo.completed).length;
+  const hasCompletedTodo = todos.some(todo => todo.completed);
+  let isDeletionCompleted = false;
 
-  const handleComplDel = () => {
-    isDelCompleted = true;
+  const handleDeleteCompleted = () => {
+    isDeletionCompleted = true;
     onDeleteCompleted();
   };
 
   return (
     <footer className="todoapp__footer" data-cy="Footer">
       <span className="todo-count" data-cy="TodosCounter">
-        {activeTodos} items left
+        {activeTodosCount} items left
       </span>
 
       <nav className="filter" data-cy="Filter">
-        {allFilters.map(filter => (
+        {filtersValue.map(filter => (
           <a
             key={filter}
             href={`#/${filter !== Filters.All ? filter.toLowerCase() : ''}`}
@@ -51,9 +51,9 @@ export const TodoFooter: React.FC<Props> = ({
         type="button"
         className="todoapp__clear-completed"
         data-cy="ClearCompletedButton"
-        disabled={isDelCompleted || !isCompleted}
-        style={{ visibility: !isCompleted ? 'hidden' : 'visible' }}
-        onClick={handleComplDel}
+        disabled={isDeletionCompleted || !hasCompletedTodo}
+        style={{ visibility: !hasCompletedTodo ? 'hidden' : 'visible' }}
+        onClick={handleDeleteCompleted}
       >
         Clear completed
       </button>

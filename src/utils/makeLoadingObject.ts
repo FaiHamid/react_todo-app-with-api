@@ -1,10 +1,10 @@
 import { LoadingType, Todo } from '../types';
 
-export const makeLoadingObject = (arr: Todo[]): LoadingType => {
-  return arr.reduce((acc: LoadingType, curr: Todo): LoadingType => {
+export const makeLoadingObject = (todos: Todo[]): LoadingType => {
+  return todos.reduce((acc: LoadingType, todo: Todo): LoadingType => {
     return {
       ...acc,
-      [curr.id]: curr.id,
+      [todo.id]: todo.id,
     };
   }, {} as LoadingType);
 };

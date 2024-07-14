@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
-import { Todo } from '../../types';
+import { ErrorMessages, Todo } from '../../types';
 import { USER_ID } from '../../api/todos';
 
 interface Props {
@@ -34,7 +34,7 @@ export const TodoHeader: React.FC<Props> = ({
     event.preventDefault();
 
     if (!value.trim()) {
-      onErrorMessage('Title should not be empty');
+      onErrorMessage(ErrorMessages.EmptyTitleError);
 
       return;
     }
@@ -46,15 +46,15 @@ export const TodoHeader: React.FC<Props> = ({
       completed: false,
     };
 
-    let flag = 0;
+    let todoCreatedSuccessfully = true;
 
     onSubmit(newTodo)
       .catch(() => {
-        onErrorMessage('Unable to add a todo');
-        flag = 1;
+        onErrorMessage(ErrorMessages.AddError);
+        todoCreatedSuccessfully = false;
       })
       .finally(() => {
-        if (flag !== 1) {
+        if (todoCreatedSuccessfully) {
           setValue('');
         }
 
